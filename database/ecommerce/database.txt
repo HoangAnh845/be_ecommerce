@@ -1,0 +1,414 @@
+TABLE users{
+  id INT [PK, increment]
+  book_address_id INT
+  avater VARCHAR(100) [default:"ảnh mặc định hệ thống"]
+  image_cover VARCHAR(100)
+  username VARCHAR(50) [not null] // Tên đại diện hiện thị
+  first_name VARCHAR(50) [not null]
+  last_name VARCHAR(50) [not null]
+  birthday DATE [not null]
+  email VARCHAR(50) [not null]
+  password VARCHAR(150) [not null]
+  address VARCHAR(100)
+  city VARCHAR(100)
+  country VARCHAR(100)
+  phone VARCHAR(50)
+  gender ENUM('Man','Woman','Other')
+  role ENUM('user', 'member', 'admin') [default:'user']
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE book_address{
+  id INT [PK, increment]
+  user_id INT
+  address_default VARCHAR(50)
+  address_list JSON [default:'[]']
+  phone VARCHAR(50) 
+  address_type ENUM('company','house','other')
+}
+
+TABLE stores{
+  id INT [PK, increment]
+  user_id INT 
+  avater VARCHAR(100)
+  image_cover VARCHAR(100)
+  introduce VARCHAR(255)
+  type VARCHAR(255) // Loại hình kinh doanh
+  status ENUM('active','lock up','close') [default:'active']
+  products_total INT
+  reviews_total INT
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE ware_house{
+  id INT [PK, increment]
+  product_id INT
+  store_id INT
+  name VARCHAR(100)
+  status VARCHAR(100)
+  ware_house_type ENUM('impor Warehouse','expor Warehouse')
+  person VARCHAR(100) // Người phụ trách
+  email VARCHAR(100)
+  phone VARCHAR(100)
+  country VARCHAR(100)
+  city VARCHAR(100)
+  district VARCHAR(100) // quận/huyện
+  wards VARCHAR(100) // phường/xã
+  adress VARCHAR(100)
+  product_numbers INT // Số lượng nhập / xả
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE products{
+  id INT [PK, increment]
+  category_id INT  // Danh mục
+  store_id INT // Cửa hàng bán
+  name VARCHAR(255)
+  image_typical VARCHAR(100) // Ảnh mặc định
+  characteristic JSON [default:'[]'] // Đặc điểm sản phẩm lưu theo dạng list danh sách
+  content TEXT
+  amount VARCHAR(255)
+  price INT
+  reviews_total INT // Tổng đánh giá
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE categorys{
+  id INT [PK, increment] // Danh mục cha
+  category_chilren_id INT // Danh mục con
+  name VARCHAR(255)
+  description VARCHAR(255)
+  products_total INT // số lượng sản phẩm trong danh mục
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE keywords{
+  id INT [PK, increment]
+  status INT
+  name VARCHAR
+  description VARCHAR
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE keyword_products{ 
+  id INT [PK, increment]
+  product_id INT
+  keyword_id INT
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE properties {
+  id INT [PK, increment]
+  product_id INT
+  name VARCHAR(255)
+  value VARCHAR(255)
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE notives{
+  id INT [PK, increment]
+  to ENUM('all','user')
+  type ENUM('text','url') // dạng xem
+  values VARCHAR(200)
+  sender_id INT [default:'admin_id'] // Admin
+  receiver_id INT // User
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+
+TABLE favourites{
+  id INT [PK, increment]
+  user_id INT
+  reference_id INT // id tham chiếu
+  reference_type ENUM('products', 'blogs')
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+
+TABLE reviews{
+  id INT [PK,increment]
+  message TEXT
+  rating_value ENUM('1','2','3','4','5')
+  product_id INT
+  user_id INT
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+
+TABLE blogs{
+  id INT [PK, increment]
+  user_id INT // Member
+  category_blog_id INT // Loại tag của bài viết về danh mục sản phẩm
+  image_typical VARCHAR(200)
+  content TEXT
+  status ENUM('duyet','cho duyet') [default:'cho duyet']
+  comments_total INT // Số lượng bình luận
+  favourites_total INT // Số lượt thích
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE category_blogs{
+  id INT [PK, increment]
+  name VARCHAR(100)
+  content TEXT
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE comments{
+  id INT [PK, increment]
+  blog_id INT
+  user_id INT
+  message TEXT
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+TABLE orders{
+  id INT [PK, increment]
+  user_id INT
+  book_address_id INT // địa chỉ giao hàng
+  note TEXT
+  status VARCHAR
+  price_total INT
+  payment_status INT
+  transport_status VARCHAR
+  products_list JSON // Table - transactions
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE emails{
+  id INT [PK, increment]
+  reference_id INT
+  reference_type ENUM('order', 'forgot_password','member')
+  recipient_email VARCHAR(255) [not null] 
+  subject VARCHAR(255) [not null]
+  body TEXT [not null]
+  status VARCHAR(20) [default: 'Pending']
+  sent_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+
+TABLE transactions{ // Xem chi tiết đơn hàng
+  id INT [PK, increment]
+  order_id INT
+  product_id INT
+  user_id INT
+  discount_id INT
+  status VARCHAR
+  name VARCHAR // tên sp
+  avater VARCHAR // ảnh mặc định of sp
+  quantity INT
+  price_total INT // Tổng tiền
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE transports{
+  id INT [PK, increment]
+  product_id INT // đơn vị vận chuyển sản phẩm
+  order_id INT
+  name VARCHAR(100)  // nhà vận chuyển
+  status VARCHAR(100)
+  transport_fee INT  // phí
+  currency_type VARCHAR // Loại Tiền tệ
+  service VARCHAR(100) // Dịch vụ loại vận chuyển nào
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE payments{
+  id INT [PK, increment]
+  order_id INT
+  status VARCHAR(50)
+  amount INT // số tiền thanh toán.
+  currency VARCHAR // Là đơn vị tiền tệ (VND, USD, etc.).  
+  method VARCHAR(50) // Hình thức thanh toán
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+
+TABLE info_website{
+  id INT [PK, increment]
+  logo VARCHAR // ảnh logo
+  email VARCHAR
+  phone VARCHAR
+  contact VARCHAR
+  products_total INT // Tổng số sản phẩm hiện có 
+  users_total INT  // Tổng số thành viên 
+  revenue_total INT  // Doanh thu 
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+TABLE discounts{
+  id INT [PK, increment]
+  reference_id INT
+  product_id INT
+  reference_type ENUM('admin','store') // người tạo phiếu giảm giá
+  name VARCHAR(100) // mã giảm giá
+  proviso TEXT // Điều kiện
+  expiry DATE // hạng sử dụng
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE share_discounts{ // admin share phiếu giảm giá
+  id INT [PK, increment]
+  user_id INT 
+  discount_id INT
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+
+TABLE chats{
+  id INT [PK,increment]
+  message_content TEXT
+  sender_id INT // Admin
+  receiver_id INT // User
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']// Dựa vào thời gian để xác định thứ tự cuộc trò chuyện
+}
+
+TABLE slides{
+  id INT [PK,increment]
+  status VARCHAR(100)
+  caption VARCHAR(200)
+  page_url VARCHAR(200) // Xác định trang sử dụng slider
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE gallery_images{
+  id INT [PK,increment]
+  reference_type ENUM('products', 'slides','blogs','reviews')
+  path VARCHAR(100) // Đường dẫn link ảnh
+  reference_id INT
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+TABLE statistics{
+  id INT [PK, increment]
+  metric_name VARCHAR(255)
+  metric_value INT
+  reference_type ENUM('products', 'users','orders','blog','reviews','store')
+  reference_id INT
+  created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+  update_at TIMESTAMP
+}
+
+// Setup mối quan hệ
+// <: one-many
+// >: many-one
+// -: one-one
+// <>: many-many
+
+
+// Quản lý người dùng
+Ref: users.id < comments.id
+Ref: users.id < book_address.user_id
+Ref: users.id < orders.user_id
+Ref: users.id < share_discounts.user_id
+Ref: users.id < reviews.user_id
+Ref: users.id < emails.reference_id
+
+
+// Quản lý địa chỉ
+// Ref: book_address.user_id > users.id
+Ref: book_address.id - orders.book_address_id
+
+// Quản lý sản phẩm
+Ref: products.store_id - stores.id
+Ref: discounts.product_id > products.id
+Ref: products.category_id - categorys.id
+Ref: products.id < favourites.reference_id
+Ref: products.id < reviews.product_id
+Ref: products.id - keyword_products.product_id
+
+// Quản lý đánh giá
+// Ref: reviews.product_id < products.id
+// Ref: reviews.user_id > users.id
+
+// Quản lý blogs
+Ref: blogs.user_id > users.id
+Ref: comments.blog_id > blogs.id
+Ref: comments.user_id > users.id
+Ref: favourites.user_id > users.id
+Ref: blogs.category_blog_id - category_blogs.id
+
+// Quản lý từ khóa 
+Ref: keyword_products.keyword_id - keywords.id
+// Ref: keyword_products.id < products.id
+
+// Quản lý thuộc tính
+Ref: properties.product_id > products.id
+
+// Quản lý yêu thích
+Ref: favourites.reference_id > blogs.id
+// Ref: favourites.user_id > users.id
+// Ref: favourites.reference_id > products.id
+
+// Quản lý giảm giá
+// Ref: discounts.product_id > products.id
+Ref: discounts.reference_id > users.id
+Ref: discounts.reference_id > stores.id
+Ref: share_discounts.discount_id < discounts.id
+Ref: transactions.discount_id <> discounts.id
+
+// Một reviews sẽ có thể chứa nhiều hình ảnh
+Ref: reviews.id - gallery_images.reference_id
+
+// Một sản phẩm sẽ có thể chứa nhiều hình ảnh
+Ref: products.id - gallery_images.reference_id
+
+// Một blog sẽ có thể chứa nhiều hình ảnh
+Ref: blogs.id - gallery_images.reference_id
+
+// Một slider sẽ có thể chứa nhiều hình ảnh
+Ref: slides.id - gallery_images.reference_id
+
+// Quản lý cửa hàng
+Ref: stores.user_id - users.id
+Ref: ware_house.store_id - stores.id
+
+// Quản lý kho hàng
+// Ref: ware_house.store_id - stores.id
+Ref: ware_house.product_id < products.id
+
+// Quản lý đơn hàng
+// Ref: orders.user_id > users.id
+Ref: transports.order_id > orders.id
+Ref: payments.order_id - orders.id
+Ref: transactions.order_id > orders.id
+Ref: transactions.product_id <> products.id
+Ref: transports.product_id <> products.id
+Ref: orders.id - emails.reference_id
+
+// Có thể thống kế nhiều loại dữ liệu cho một đối tượng củ thể
+Ref: statistics.reference_id > products.id
+Ref: statistics.reference_id > users.id
+Ref: statistics.reference_id > blogs.id
+Ref: statistics.reference_id > reviews.id
+Ref: statistics.reference_id > stores.id
+
+// Một người dùng sẽ nhận nhiều thông báo
+Ref: users.id < notives.receiver_id
+Ref: users.id < notives.sender_id
+
+// Admin có thể gửi tin cho nhiều người dùng
+Ref: chats.sender_id < users.id
+
+// Một người dùng chỉ có thể chat với một admin
+Ref: chats.receiver_id - users.id
+
+
