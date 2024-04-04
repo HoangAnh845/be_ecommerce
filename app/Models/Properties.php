@@ -15,7 +15,8 @@ class Properties extends Model
         'value',
     ];
 
-    // protected $casts = [
-    //     'value' => 'array',
-    // ];
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

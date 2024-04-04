@@ -22,6 +22,7 @@ class CategoryResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "description" => $this->description,
+            "avatar" => $this->avatar,
             "products_total" => $products_total,
             "category_children" => $category_children,
         ];

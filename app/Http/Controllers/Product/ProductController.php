@@ -16,9 +16,10 @@ use Illuminate\Support\Arr;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = DB::table('products')->paginate(10);
+        $paginate = $request->has('paginate') ? $request->paginate : 18;
+        $products = DB::table('products')->paginate($paginate);
         $productResource = [];
         foreach ($products as $key => $value) {
             $product = new ProductResource($value);
@@ -30,6 +31,7 @@ class ProductController extends Controller
                 'perPage' => $products->perPage(),
                 'currentPage' => $products->currentPage(),
                 'lastPage' => $products->lastPage(),
+                'first_page_url' => $products->url(1),
             ]]);
         }
         return $this->resProduct(Response::HTTP_NOT_FOUND, 'Không tìm thấy sản phẩm');
@@ -54,8 +56,8 @@ class ProductController extends Controller
     {
         $productInput = $request->except('properties');
         $propertiesInput = $request->only('properties');
-        $json = str_replace("'", "\"", $propertiesInput['properties']); // Thay thế dấu nháy đơn bằng dấu nháy kép để đảm bảo định dạng JSON hợp lệ
-        $array = json_decode($json, true);
+        // $json = str_replace("'", "\"", $propertiesInput['properties']); // Thay thế dấu nháy đơn bằng dấu nháy kép để đảm bảo định dạng JSON hợp lệ
+        $array = $propertiesInput['properties'];
 
         $product = Product::create($productInput);
         foreach ($array as $key => $value) {
@@ -65,6 +67,7 @@ class ProductController extends Controller
                 'value' => $value['value']
             ];
         }
+        
         // Tạo thuộc tính sản phẩm
         DB::table('properties')->insert($propertiesItems);
         $propertiesDate = DB::table('properties')->where('product_id', $product->id)->get();
@@ -146,6 +149,25 @@ class ProductController extends Controller
     public function filter(Request $request)
     {
         $queryProduct = DB::table('products');
+        $productData = Product::where('category_id', 93)
+            ->join('properties', 'products.id', '=', 'properties.product_id')
+            ->select('products.id', 'properties.name', 'properties.value')
+            ->get()
+            ->toArray();
+
+        $groupedData = [];
+        foreach ($productData as $data) {
+            $groupedData[$data['name']][] = $data['value'];
+        }
+        
+        $result = [];
+        foreach ($groupedData as $name => $values) {
+            $result[] = [
+                'name' => $name,
+                'value' => array_values(array_unique($values))
+            ];
+        }
+        return $this->resProduct(Response::HTTP_OK, 'tìm thấy sản phẩm', ['data' => $result]);
 
         // Tìm kiếm theo tên
         if ($request->has('name')) {

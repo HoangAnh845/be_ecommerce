@@ -16,3 +16,5 @@ class Category extends Model
         'products_total',
     ];
 }
+
+

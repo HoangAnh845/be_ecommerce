@@ -30,6 +30,7 @@ class ProductResource extends JsonResource
             "avatar" => $this->avatar,
             "image_other"=> $this->image_other,
             "price" => $this->price,
+            "note" => $this->note,
             'properties' => $propertiesResouce,
         ]; 
     }

@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
+use App\Models\Product;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
@@ -28,11 +29,18 @@ class CategoryController extends Controller
 
     public function show($id)
     {
-        $categorys = DB::table('categorys')->where('parent_id', $id)->get();
-        foreach ($categorys as $key => $category) {
+        
+        $categoryParent = DB::table('categorys')->where('id', $id)->get();
+        $categoryResouce = [];
+        $categorysChildren = DB::table('categorys')->where('parent_id', $id)->get();
+        foreach ($categorysChildren as $key => $category) {
             $category = new CategoryResource($category);
             $categoryResouce[] = $category;
         }
+        // Hợp nhất nhất category cha và category con
+        $categoryResouce = array_merge($categoryParent->toArray(), $categoryResouce);
+
+
         if (count($categoryResouce) > 0) {
             return $this->resCategory(Response::HTTP_OK, 'Lấy danh sách danh mục thành công', ['data' => $categoryResouce]);
         }
@@ -94,12 +102,44 @@ class CategoryController extends Controller
     public function filter(Request $request)
     {
         // Tìm kiếm sản phẩm cho danh mục
-        $listProducts = DB::table('products')->where('category_id', $request->id)->get();
-        foreach ($listProducts as $key => $product) {
-            $listProducts = new ProductResource($product);
-            $productResource[] = $listProducts;
+        $tiki_best = $request->input('tiki_best') || 0;
+        $genuine = $request->input('genuine') || 0;
+        // làm thế nào để tìm category cha của các category con trong bảng product
+        // Bước 1: Tìm ra tất cả các category có parent_id bằng với $parentId
+        // Khi ra được các category con thì tiếp lấy category con đó để tìm ra các category con của nó
+        // Lặp lại cho đến khi không còn category con nào nữa
+        // $categoryIds = [];
+        // $parentId = $request->id;
+
+
+        $categoryIds = DB::table('categorys')->where('parent_id', $request->id)->pluck('id');
+        $mergedArray = collect([]); // Create an empty collection
+
+
+        $mergedArray = $mergedArray->merge($categoryIds);
+        foreach ($categoryIds as $category) {
+            // Hợp nhất các category con và category hiện tại
+            $mergedArray = $mergedArray->merge(DB::table('categorys')->where('parent_id', $category)->pluck('id'));
         }
-        if ($productResource) {
+
+        // Tìm ra tất cả các category con của category hiện tại
+        $categoryChildren = $mergedArray->toArray();
+        if (count($categoryIds) === 0) { // count($categoryChildren) == 0 || 
+            $categoryChildren[] = $request->id;
+        }
+        // dd($categoryChildren[]);
+        // Bước 2: Sử dụng các id của các category tìm được để tìm ra các sản phẩm trong bảng product với tiki_best
+        $listProducts = Product::whereIn('category_id', $categoryChildren)
+            // ->where('genuine', $genuine)
+            // ->where('tiki_best', $tiki_best)
+            ->get();
+
+
+        if (count($listProducts) > 0) {
+            foreach ($listProducts as $key => $product) {
+                $listProducts = new ProductResource($product);
+                $productResource[] = $listProducts;
+            }
             return $this->resCategory(Response::HTTP_OK, 'Tìm kiếm sản phẩm theo danh mục thành công', ['data' => $productResource]);
         }
         return $this->resCategory(Response::HTTP_BAD_REQUEST, 'Không thấy sản phẩm theo danh mục');
@@ -122,3 +162,6 @@ class CategoryController extends Controller
         return Response($result, $status);
     }
 }
+
+
+// {"name":"Hướng dẫn bảo quản", "value":"Nơi khô ráo thoáng mát, tránh ánh nắng trực tiếp. Sử dụng trong vòng 4 tuần sau khi mở hộp. Đậy kín nắp hộp sau mỗi lần sử dụng."}

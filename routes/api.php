@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-$routes = glob(__DIR__ . "/api/*.php");
+$routes = glob(__DIR__ . "/api/*.php"); 
 foreach ($routes as $route) require($route);
 
 // Đường dẫn API
