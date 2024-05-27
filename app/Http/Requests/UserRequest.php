@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Core\ResponseService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -22,27 +23,16 @@ class UserRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules()
-    { // phương thức này trả về một mảng các quy tắc xác thực mà tất cả các dữ liệu đầu vào của người dùng phải tuân theo
-        switch ($this->method()) {
-            case 'POST':
-                return [
-                    'username' => 'required|string|min:3|max:50|unique:users',
-                    'first_name' => 'required|string|min:3|max:50',
-                    'last_name' => 'required|string|min:3|max:50',
-                    'birthday' => 'required|date',
-                    'gender' => 'required',
-                    'email' => 'required|email|unique:users',
-                    'password' => 'required|string|min:5'
-                ];
-            case 'PUT':
-                return [
-                    'first_name' => 'required|string|min:3|max:50',
-                    'last_name' => 'required|string|min:3|max:50',
-                    'gender' => 'required',
-                ];
-            default:
-                return [];
-        }
+    {
+        return [
+            'username' => 'required|string|min:3|max:50|unique:users,username,' . $this->id,
+            'first_name' => 'required|string|min:3|max:50',
+            'last_name' => 'required|string|min:3|max:50',
+            'birthday' => 'required|date',
+            'gender' => 'required',
+            'email' => 'required|email|unique:users,email,' . $this->id,
+            'password' => 'required|string|min:5'
+        ];
     }
 
     public function messages()
@@ -72,10 +62,6 @@ class UserRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-        throw new HttpResponseException(response()->json([
-            'name' => 'Lỗi xác thực',
-            'status' => 422,
-            'message' => $validator->errors()
-        ], 422));
+        throw new HttpResponseException(ResponseService::error($validator->errors()->first(), 422));
     }
 }

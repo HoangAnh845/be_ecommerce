@@ -3,7 +3,10 @@
 namespace App\Http\Middleware;
 
 // use GuzzleHttp\Psr7\Response;
+
+use App\Core\ResponseService;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -14,13 +17,9 @@ class Authenticate extends Middleware
      */ // 
     protected function redirectTo(Request $request)
     {
-        if ($request->expectsJson()) {
-            return null;
+        if (!$request->expectsJson()) {
+            return route('login');
         }
-    
-        return route('login');
-        // response('Unauthorized', Response::HTTP_UNAUTHORIZED)->withHeaders([
-        //     'Content-Type' => 'text/plain',
-        // ]);
+        // return ;
     }
 }

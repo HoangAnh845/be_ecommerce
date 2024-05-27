@@ -31,17 +31,17 @@ return [
     'disks' => [
 
         'local' => [
-            'driver' => 'local',
-            'root' => storage_path('app'),
+            'driver' => 'local', // LOẠI DRIVER
+            'root' => storage_path('app'), // ĐƯỜNG DẪN ĐẾN THƯ MỤC CHỨA FILE
             'throw' => false,
         ],
 
         'public' => [
-            'driver' => 'local',
+            'driver' => 'local', // LOẠI DRIVER
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
-            'visibility' => 'public',
-            'throw' => false,
+            'url' => env('APP_URL').'/storage', // URL ĐẾN THƯ MỤC CHỨA FILE
+            'visibility' => 'public', // QUYỀN TRUY CẬP FILE
+            'throw' => false, // BẮT LỖI
         ],
 
         's3' => [

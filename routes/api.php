@@ -1,12 +1,21 @@
 <?php
 
-use App\Http\Controllers\ClientController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Article\ArticleController;
+use App\Http\Controllers\Article\CommentController;
+use App\Http\Controllers\Article\MenuController;
+use App\Http\Controllers\Product\ProductController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\User\AuthController;
-use App\Http\Controllers\User\UserController;
-use App\Http\Controllers\SignatureController;
-use Illuminate\Routing\Router;
+use App\Http\Controllers\Api\Auth\ApiAuthController;
+use App\Http\Controllers\API\User\ApiUserController;
+use App\Http\Controllers\Order\OrderController;
+use App\Http\Controllers\Product\CategoryController;
+use App\Http\Controllers\Product\FavouriteController as ProductFavouriteController;
+use App\Http\Controllers\Article\FavouriteController as ArticleFavouriteController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\Order\PaymentController;
+use App\Http\Controllers\Order\TransactionController;
+use App\Http\Controllers\Product\ReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,68 +28,132 @@ use Illuminate\Routing\Router;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+// $routes = glob(__DIR__ . "/api/*.php"); 
+// foreach ($routes as $route) require($route);
+Route::group(['prefix' => 'v1'], function () {
+    Route::group(['prefix' => 'auth'], function () {
+        Route::post('login', [ApiAuthController::class, 'login']);
+    });
+
+    Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () {
+        Route::post('logout', [ApiAuthController::class, 'logout']);
+
+        Route::get('', [ApiUserController::class, 'index']);
+        Route::post('register', [ApiUserController::class, 'store']);
+        Route::put('update/{id}', [ApiUserController::class, 'update']);
+        // Route::put('update/{id}', function(){
+        //     dd(2);
+        // });
+        Route::delete('delete/{id}', [ApiUserController::class, 'destroy']);
+        Route::get('{id}', [ApiUserController::class, 'show']);
+    });
+
+    Route::group(['prefix' => 'admin'], function () {
+        Route::group(['prefix' => 'category'], function () {
+            Route::get('', [CategoryController::class, 'index']);
+            Route::get('{id}', [CategoryController::class, 'show']);
+            Route::post('store', [CategoryController::class, 'store']);
+            Route::put('update/{id}', [CategoryController::class, 'update']);
+            Route::delete('destroy/{id}', [CategoryController::class, 'destroy']);
+        });
+
+        Route::group(['prefix' => 'product'], function () {
+            Route::get('', [ProductController::class, 'index']);
+            Route::get('{id}', [ProductController::class, 'show']);
+            Route::post('store', [ProductController::class, 'store']);
+            Route::put('update/{id}', [ProductController::class, 'update']);
+            Route::delete('destroy/{id}', [ProductController::class, 'destroy']);
+
+            Route::group(['prefix' => 'favorite'], function () {
+                Route::get('', [ProductFavouriteController::class, 'index']);
+                Route::get('{id}', [ProductFavouriteController::class, 'show']);
+                Route::post('store', [ProductFavouriteController::class, 'store']);
+                Route::put('update/{id}', [ProductFavouriteController::class, 'update']);
+                Route::delete('destroy/{id}', [ProductFavouriteController::class, 'destroy']);
+            });
+
+            Route::group(['prefix' => 'review'], function () {
+                Route::get('', [ReviewController::class, 'index']);
+                Route::get('{id}', [ReviewController::class, 'show']);
+                Route::post('store', [ReviewController::class, 'store']);
+                Route::put('update/{id}', [ReviewController::class, 'update']);
+                Route::delete('destroy/{id}', [ReviewController::class, 'destroy']);
+            });
+        });
+
+
+        Route::group(['prefix' => 'order'], function () {
+            Route::get('', [OrderController::class, 'index']);
+            Route::get('{id}', [OrderController::class, 'show']);
+            Route::get('update/{id}', [OrderController::class, 'update']);
+            Route::delete('destroy/{id}', [OrderController::class, 'destroy']);
+
+            Route::group(['prefix' => 'transaction'], function () {
+                Route::get('', [TransactionController::class, 'index']);
+                Route::get('{id}', [TransactionController::class, 'show']);
+                Route::post('store', [TransactionController::class, 'store']);
+                Route::put('update/{id}', [TransactionController::class, 'update']);
+                Route::delete('destroy/{id}', [TransactionController::class, 'destroy']);
+            });
+
+            Route::group(['prefix' => 'payment'], function () {
+                Route::get('', [PaymentController::class, 'index']);
+                Route::get('{id}', [PaymentController::class, 'show']);
+                Route::post('store', [PaymentController::class, 'store']);
+                Route::put('update/{id}', [PaymentController::class, 'update']);
+                Route::delete('destroy/{id}', [PaymentController::class, 'destroy']);
+            });
+        });
+
+        Route::group(['prefix' => 'menu'], function () {
+            Route::get('', [MenuController::class, 'index']);
+            Route::get('{id}', [MenuController::class, 'show']);
+            Route::post('store', [MenuController::class, 'store']);
+            Route::put('update/{id}', [MenuController::class, 'update']);
+            Route::delete('destroy/{id}', [MenuController::class, 'destroy']);
+        });
+
+        Route::group(['prefix' => 'article'], function () {
+            Route::get('', [ArticleController::class, 'index']);
+            Route::get('{id}', [ArticleController::class, 'show']);
+            Route::post('store', [ArticleController::class, 'store']);
+            Route::put('update/{id}', [ArticleController::class, 'update']);
+            Route::delete('destroy/{id}', [ArticleController::class, 'destroy']);
+
+            Route::group(['prefix' => 'favorite'], function () {
+                Route::get('', [ArticleFavouriteController::class, 'index']);
+                Route::get('{id}', [ArticleFavouriteController::class, 'show']);
+                Route::post('store', [ArticleFavouriteController::class, 'store']);
+                Route::put('update/{id}', [ArticleFavouriteController::class, 'update']);
+                Route::delete('destroy/{id}', [ArticleFavouriteController::class, 'destroy']);
+            });
+
+            Route::group(['prefix' => 'comment'], function () {
+                Route::get('', [CommentController::class, 'index']);
+                Route::get('{id}', [CommentController::class, 'show']);
+                Route::post('store', [CommentController::class, 'store']);
+                Route::put('update/{id}', [CommentController::class, 'update']);
+                Route::delete('destroy/{id}', [CommentController::class, 'destroy']);
+            });
+        });
+
+        Route::group(['prefix' => 'discount'], function () {
+            Route::get('', [DiscountController::class, 'index']);
+            Route::get('{id}', [DiscountController::class, 'show']);
+            Route::post('store', [DiscountController::class, 'store']);
+            Route::put('update/{id}', [DiscountController::class, 'update']);
+            Route::delete('destroy/{id}', [DiscountController::class, 'destroy']);
+        });
+
+        Route::group(['prefix' => 'chat'], function () {
+            Route::get('', [ChatController::class, 'index']);
+            Route::get('{id}', [ChatController::class, 'show']);
+            Route::post('store', [ChatController::class, 'store']);
+            Route::put('update/{id}', [ChatController::class, 'update']);
+            Route::delete('destroy/{id}', [ChatController::class, 'destroy']);
+        });
+    });
 });
-
-$routes = glob(__DIR__ . "/api/*.php"); 
-foreach ($routes as $route) require($route);
-
-// Đường dẫn API
-// Route::middleware(['check.signature'])->group(function () {
-//     Route::get('users', [UserController::class, 'getAllUsers']);
-//     Route::get('users/{id}', [UserController::class, 'getUser']);
-// });
-
-// Route::middleware('auth:api')->group(function () {
-//     Route::get('user/token', [UserController::class, 'getUserDetail']);
-// });
-
-// Đường dẫn bên hệ thống
-
-
-// Đường dẫn hành động với client
-// Route::prefix('clients')->group(function () {
-//     Route::get('/', [ClientController::class, 'getAllClients']);
-//     Route::post('/{id}', [ClientController::class, 'getClient']);
-//     Route::post('/add', [ClientController::class, 'addClient']);
-//     Route::post('/edit/{id}', [ClientController::class, 'updateClient']);
-//     Route::post('/delete/{id}', [ClientController::class, 'deleteClient']);
-// });
-
-// Đường dẫn hành động với chữ ký
-// Route::prefix('signature')->group(function () {
-//     Route::get('/{id}', [SignatureController::class, 'getSignature']);
-//     Route::post('/create', [SignatureController::class, 'createSignature']);
-// });
-
-// // Đường dẫn hành động với người dùng
-// Route::prefix('user')->group(function () {
-//     Route::post('/login', [AuthController::class, 'loginUser']);
-//     Route::middleware('auth:api')->post('/logout', [AuthController::class, 'userLogout']);
-// });
-
-
-
-// Route::controller(UserController::class)->group(function () {
-//     Route::get('user/token', 'getUserDetail');
-// })->middleware('auth:api');
-
-// // Đường dẫn bên hệ thống
-// // Route::post('register', [UserController::class, 'registerUser']);
-
-
-// // Đường dẫn hành động với client
-// Route::controller(ClientController::class)->group(function () {
-//     Route::get('/clients', 'getAllClients');
-//     Route::post('/clients/{id}', 'getClient');
-//     Route::post('/client/add', 'addClient');
-//     Route::post('/clients/edit/{id}', 'updateClient');
-//     Route::post('/clients/delete/{id}', 'deleteClient');
-// });
-// // Đường dĐường dẫn hành động với chữ kýchữ ký
-// Route::controller(SignatureController::class)->group(function () {
-//     Route::get('/signature/{id}', 'getSignature');
-//     Route::post('/createSignature', 'createSignature');
-// });
-

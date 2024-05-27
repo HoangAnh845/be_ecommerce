@@ -26,7 +26,7 @@ class ForgotPassword extends Mailable
     /**
      * Get the message envelope.
      */
-    public function envelope(): Envelope
+    public function envelope(): Envelope // Dùng để thiết lập các thông số như subject, cc, bcc, replyTo, ...
     {
         return new Envelope(
             subject: 'Ecommerce - Quên mật khẩu',

@@ -29,9 +29,21 @@ class ProductResource extends JsonResource
             "describe"=> $this->describe,
             "avatar" => $this->avatar,
             "image_other"=> $this->image_other,
+            "total_sell"=> $this->total_sell,
+            "tiki_best" => $this->tiki_best,
+            "genuine" => $this->genuine,
             "price" => $this->price,
             "note" => $this->note,
+            "outstan" => $this->outstan,
             'properties' => $propertiesResouce,
         ]; 
     }
 }
+
+
+
+
+
+
+
+

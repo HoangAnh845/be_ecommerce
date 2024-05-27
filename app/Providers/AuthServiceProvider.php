@@ -29,7 +29,6 @@ class AuthServiceProvider extends ServiceProvider
         // Dùng để đăng ký các policies
         // policies là các quy tắc để kiểm tra quyền của user
         $this->registerPolicies();
-        // Passport::routes();
 
         Passport::tokensExpireIn(now()->addDays(15)); // Tonken hết hạn sau 15 ngày của bảng oauth_access_tokens
         Passport::refreshTokensExpireIn(now()->addDays(30)); // Token refresh hết hạn sau 30 ngày của bảng oauth_refresh_tokens

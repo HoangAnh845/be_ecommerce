@@ -72,23 +72,3 @@ class AuthController extends Controller
     }
 }
 
-
-// use Tymon\JWTAuth\Facades\JWTAuth;
-// use Tymon\JWTAuth\Exceptions\JWTException;
-
-// try {
-//     $token = $request->bearerToken();
-//     $decoded = JWTAuth::decode(JWTAuth::setToken($token)); 
-
-//     // Check if the client ID in the token matches the expected client ID
-//     if ($decoded->get('aud') === $clientId) {
-//         // The token is valid
-//         return $next($request);
-//     } else {
-//         // The token is invalid
-//         return response()->json(['error' => 'Invalid token'], 401);
-//     }
-// } catch (JWTException $e) {
-//     // Something went wrong whilst attempting to decode the token
-//     return response()->json(['error' => 'Invalid token'], 401);
-// }
