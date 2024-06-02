@@ -31,9 +31,7 @@ use App\Http\Controllers\Product\ReviewController;
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
-// $routes = glob(__DIR__ . "/api/*.php"); 
-// foreach ($routes as $route) require($route);
-Route::group(['prefix' => 'v1'], function () {
+Route::group(['prefix' => 'v1/admin'], function () {
     Route::group(['prefix' => 'auth'], function () {
         Route::post('login', [ApiAuthController::class, 'login']);
     });
